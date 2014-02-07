@@ -1,5 +1,7 @@
 import weechat
 
+# NOTE: This will probably be deprecated with task 13074 (https://savannah.nongnu.org/task/?13074)
+
 def set_unread(data, buffer, args):
   args = args.strip()
   if args == "":
