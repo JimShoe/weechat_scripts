@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import weechat
 import re
+import urllib
 
 SCRIPT_NAME    = "shorturl"
 SCRIPT_AUTHOR  = "JimShoe <nathan@frcv.net>"
@@ -30,6 +31,7 @@ def print_short(data, command, rc, out, err):
 # call hook_process based on shortener setting
 def shorten(buffer, url):
   shortener = weechat.config_get_plugin('shortener')
+  url = urllib.quote(url)
   if shortener == 'rldn':
     url = "url:http://rldn.net/api/%s" % (url,)
   if shortener == 'is.gd':
