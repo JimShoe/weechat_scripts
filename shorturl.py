@@ -23,7 +23,7 @@ def print_short(data, command, rc, out, err):
   # parse response based on shortener setting
   if shortener == 'rldn':
     status, url = out.split()
-  if shortener == 'is.gd':
+  if shortener == 'is.gd' or shortener == 'v.gd' or shortener == 'narro.ws':
     url = out
   weechat.prnt(data, '%(color)s%(url)s%(reset)s' % dict(color=color,reset=reset,url=url))
   return weechat.WEECHAT_RC_OK
@@ -36,6 +36,10 @@ def shorten(buffer, url):
     url = "url:http://rldn.net/api/%s" % (url,)
   if shortener == 'is.gd':
     url = "url:http://is.gd/create.php?format=simple&url=%s" % (url,)
+  if shortener == 'v.gd':
+    url = "url:http://v.gd/create.php?format=simple&url=%s" % (url,)
+  if shortener == 'narro.ws':
+      url = "url:http://narro.ws/create/%s" % (url,)
   weechat.hook_process(url,
     30 * 1000, 
     "print_short", 
@@ -81,7 +85,7 @@ if __name__ == "__main__":
       "         URL: URL to shorten (multiple URLs may be given)\n", "", "shortenurl", "");
 
     settings = {
-      'shortener': ('is.gd', 'URL Shortener to use.'),
+      'shortener': ('is.gd', 'URL Shortener to use. (is.gd, v.gd, rldn.net, narro.ws)'),
       'urllength': ('40', 'Max length of url before shortening.'),
       'color': ('lightblue', 'Color for all urls.'),
     }
