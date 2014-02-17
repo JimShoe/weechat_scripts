@@ -1,11 +1,50 @@
 #!/usr/bin/python
+#
+# Copyright (C) 2014 Nathan Warner <nathan@frcv.net>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# Colors and shotens urls inline.  Adds shorturl function to shorten
+# and print url to current buffer.
+#
+# *NOTE*: Shorten urls may be printed after other lines depending on how long
+#         it takes for the shortener to reply.
+#
+# History:
+#
+# 2014-02-17, Nathan Warner <nathan@frcv.net>:
+#     v0.3: Added v.gd and narro.ws as shorteners.
+#         : Fixed issue with not coloring multiple urls.
+#         : Added license.
+# 2014-02-11, Nathan Warner <nathan@frcv.net>:
+#     v0.2: Added url quoting before sending off.
+# 2014-02-07, Nathan Warner <nathan@frcv.net>:
+#     v0.1: Inital release.
+#
+# Help about settings:
+#   display all settings for script (or use iset.pl script to change settings):
+#      /set plugins.var.python.shorturl.*
+#
+
 import weechat
 import re
 import urllib
 
 SCRIPT_NAME    = "shorturl"
 SCRIPT_AUTHOR  = "JimShoe <nathan@frcv.net>"
-SCRIPT_VERSION = "0.1"
+SCRIPT_VERSION = "0.3"
 SCRIPT_LICENSE = "GPL3"
 SCRIPT_DESC    = "Shortens url and puts them inline."
 
@@ -73,9 +112,10 @@ def modifier_cb(data, modifier, modifier_data, string):
     reset = weechat.color('reset')
     urllength = int(weechat.config_get_plugin('urllength'))
     if len(url) < urllength:
-      return re.sub(re.escape(url), "%(color)s%(url)s%(reset)s", string) % dict(color=color,reset=reset,url=url)
-    buffer = getbuffer(modifier_data, string)
-    shorten(buffer, url)
+      string = re.sub(re.escape(url), "%(color)s%(url)s%(reset)s", string) % dict(color=color,reset=reset,url=url)
+    else:
+      buffer = getbuffer(modifier_data, string)
+      shorten(buffer, url)
   return string
 
 if __name__ == "__main__":
