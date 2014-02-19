@@ -24,6 +24,9 @@
 #
 # History:
 #
+# 2014-02-19, Nathan Warner <nathan@frcv.net>:
+#     v0.4: Fixed error with regex sub.
+#         : Changed to usinig .format for strings.
 # 2014-02-17, Nathan Warner <nathan@frcv.net>:
 #     v0.3: Added v.gd and narro.ws as shorteners.
 #         : Fixed issue with not coloring multiple urls.
@@ -64,7 +67,8 @@ def print_short(data, command, rc, out, err):
     status, url = out.split()
   if shortener == 'is.gd' or shortener == 'v.gd' or shortener == 'narro.ws':
     url = out
-  weechat.prnt(data, '%(color)s%(url)s%(reset)s' % dict(color=color,reset=reset,url=url))
+  color_url = "{color}{url}{reset}".format(color=color, url=url, reset=reset)
+  weechat.prnt(data, color_url)
   return weechat.WEECHAT_RC_OK
 
 # call hook_process based on shortener setting
@@ -72,13 +76,13 @@ def shorten(buffer, url):
   shortener = weechat.config_get_plugin('shortener')
   url = urllib.quote(url)
   if shortener == 'rldn':
-    url = "url:http://rldn.net/api/%s" % (url,)
+    url = "url:http://rldn.net/api/{url}".format(url=url)
   if shortener == 'is.gd':
-    url = "url:http://is.gd/create.php?format=simple&url=%s" % (url,)
+    url = "url:http://is.gd/create.php?format=simple&url={url}".format(url=url)
   if shortener == 'v.gd':
-    url = "url:http://v.gd/create.php?format=simple&url=%s" % (url,)
+    url = "url:http://v.gd/create.php?format=simple&url={url}".format(url=url)
   if shortener == 'narro.ws':
-      url = "url:http://narro.ws/create/%s" % (url,)
+      url = "url:http://narro.ws/create/{url}".format(url=url)
   weechat.hook_process(url,
     30 * 1000, 
     "print_short", 
@@ -97,22 +101,24 @@ def shortenurl(data, buffer, args):
 # returns buffer using data from hook_modifier
 def getbuffer(modifier_data, string):
   msg = weechat.info_get_hashtable("irc_message_parse",{ "message": string })
-  if weechat.info_get('irc_is_channel', '%s,%s' % (modifier_data, msg['channel'])) == '1':
+  if weechat.info_get('irc_is_channel', '{moddata},{channel}'.format(moddata=modifier_data, channel=msg['channel'])) == '1':
     name = msg['channel']
   else:
     name = msg['nick']
-  buffer_full_name = '%s.%s' % (modifier_data, name)
+  buffer_full_name = '{moddata}.{name}'.format(moddata=modifier_data, name=name)
   return weechat.buffer_search("irc", buffer_full_name)
 
 # Look for urls, color if too short, shorten if too long
 def modifier_cb(data, modifier, modifier_data, string):
   urls = re.findall('[a-z]{2,5}://[^\s()\[\]]*', string)
   for url in urls:
+    weechat.prnt("", "url=> "+url)
     color = weechat.color(weechat.config_get_plugin("color"))
     reset = weechat.color('reset')
     urllength = int(weechat.config_get_plugin('urllength'))
     if len(url) < urllength:
-      string = re.sub(re.escape(url), "%(color)s%(url)s%(reset)s", string) % dict(color=color,reset=reset,url=url)
+      color_url = "{color}{url}{reset}".format(color=color, url=url, reset=reset)
+      string = re.sub(re.escape(url), color_url, string)
     else:
       buffer = getbuffer(modifier_data, string)
       shorten(buffer, url)
