@@ -63,7 +63,7 @@ def print_short(data, command, rc, out, err):
   reset = weechat.color('reset')
   shortener = weechat.config_get_plugin('shortener')
   # parse response based on shortener setting
-  if shortener == 'rldn':
+  if shortener == 'rldn.net':
     status, url = out.split()
   if shortener == 'is.gd' or shortener == 'v.gd' or shortener == 'narro.ws':
     url = out
@@ -75,7 +75,7 @@ def print_short(data, command, rc, out, err):
 def shorten(buffer, url):
   shortener = weechat.config_get_plugin('shortener')
   url = urllib.quote(url)
-  if shortener == 'rldn':
+  if shortener == 'rldn.net':
     url = "url:http://rldn.net/api/{url}".format(url=url)
   if shortener == 'is.gd':
     url = "url:http://is.gd/create.php?format=simple&url={url}".format(url=url)
@@ -112,7 +112,6 @@ def getbuffer(modifier_data, string):
 def modifier_cb(data, modifier, modifier_data, string):
   urls = re.findall('[a-z]{2,5}://[^\s()\[\]]*', string)
   for url in urls:
-    weechat.prnt("", "url=> "+url)
     color = weechat.color(weechat.config_get_plugin("color"))
     reset = weechat.color('reset')
     urllength = int(weechat.config_get_plugin('urllength'))
