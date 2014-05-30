@@ -74,7 +74,6 @@ def print_short(data, command, rc, out, err):
 # call hook_process based on shortener setting
 def shorten(buffer, url):
   shortener = weechat.config_get_plugin('shortener')
-  url = urllib.quote(url)
   if shortener == 'rldn.net':
     url = "url:http://rldn.net/api/{url}".format(url=url)
   if shortener == 'is.gd':
