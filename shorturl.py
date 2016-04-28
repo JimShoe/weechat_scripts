@@ -24,6 +24,8 @@
 #
 # History:
 #
+# 2016-04-28, Nathan Warner <nathan@frcv.net>:
+#     v0.5: Removed narro.ws shortener
 # 2014-02-19, Nathan Warner <nathan@frcv.net>:
 #     v0.4: Fixed error with regex sub.
 #         : Changed to usinig .format for strings.
@@ -46,8 +48,8 @@ import re
 import urllib
 
 SCRIPT_NAME    = "shorturl"
-SCRIPT_AUTHOR  = "JimShoe <nathan@frcv.net>"
-SCRIPT_VERSION = "0.3"
+SCRIPT_AUTHOR  = "itsamenathan <nathan@frcv.net>"
+SCRIPT_VERSION = "0.5"
 SCRIPT_LICENSE = "GPL3"
 SCRIPT_DESC    = "Shortens url and puts them inline."
 
@@ -65,7 +67,7 @@ def print_short(data, command, rc, out, err):
   # parse response based on shortener setting
   if shortener == 'rldn.net':
     status, url = out.split()
-  if shortener == 'is.gd' or shortener == 'v.gd' or shortener == 'narro.ws':
+  if shortener == 'is.gd' or shortener == 'v.gd':
     url = out
   color_url = "{color}{url}{reset}".format(color=color, url=url, reset=reset)
   weechat.prnt(data, color_url)
@@ -80,12 +82,10 @@ def shorten(buffer, url):
     url = "url:http://is.gd/create.php?format=simple&url={url}".format(url=url)
   if shortener == 'v.gd':
     url = "url:http://v.gd/create.php?format=simple&url={url}".format(url=url)
-  if shortener == 'narro.ws':
-      url = "url:http://narro.ws/create/{url}".format(url=url)
   weechat.hook_process(url,
-    30 * 1000, 
-    "print_short", 
-    buffer) 
+    30 * 1000,
+    "print_short",
+    buffer)
   return weechat.WEECHAT_RC_OK
 
 # lets you shorten multiple urls by typing /shorten URL...
@@ -125,11 +125,11 @@ def modifier_cb(data, modifier, modifier_data, string):
 if __name__ == "__main__":
   if weechat.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT_DESC, "end_script", ""):
     weechat.hook_modifier("irc_in2_privmsg", "modifier_cb", "")
-    weechat.hook_command("shortenurl", "Shortens a url and prints it to your current buffer.", "[<URL...>]", 
+    weechat.hook_command("shortenurl", "Shortens a url and prints it to your current buffer.", "[<URL...>]",
       "         URL: URL to shorten (multiple URLs may be given)\n", "", "shortenurl", "");
 
     settings = {
-      'shortener': ('is.gd', 'URL Shortener to use. (is.gd, v.gd, rldn.net, narro.ws)'),
+      'shortener': ('is.gd', 'URL Shortener to use. (is.gd, v.gd, rldn.net)'),
       'urllength': ('40', 'Max length of url before shortening.'),
       'color': ('lightblue', 'Color for all urls.'),
     }
